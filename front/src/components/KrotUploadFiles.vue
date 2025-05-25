@@ -11,7 +11,7 @@
 				img(src="/img/upload/file.svg")
 			.contnets(v-if="!showDropFiles && !file.name")
 				img.typeFile(src="/img/upload/json.svg")
-				label.labelUpload(for="file") Загрузить DATASET
+				.labelUpload(@click="openModalSelect = true") Загрузить DATASET
 				br
 				KrotUiSwitch(label="Проверка на коммерцию" v-model="type" :chosen="1" notChosen="0")
 				.text Или перетащите сюда необходимые файлы
@@ -32,13 +32,18 @@
 			.loadBar(:style="`opacity:${percent===99?0:1}`")
 				div(:style="`width:${percent}%`")
 			.cancel(@click="$_krot_upload_files_cancel") Отменить
+KrotUiModalSelect(v-if="openModalSelect" @change="$_krot_upload_files_selectFile" @close="openModalSelect = false")
 </template>
 
 <script>
 import KrotUiSwitch from "@/components/ui/KrotUiSwitch.vue";
+import {defineAsyncComponent} from "vue";
 
 export default {
-	components: {KrotUiSwitch},
+	components: {
+		KrotUiSwitch,
+		KrotUiModalSelect: defineAsyncComponent(()=> import("@/components/ui/KrotUiModalSelect.vue")),
+	},
 	emits:['upload','closeResult'],
 	data(){
 		return{
@@ -51,10 +56,32 @@ export default {
 			file: {
 				name: '',
 				size: ''
-			}
+			},
+			openModalSelect:false
 		}
 	},
 	methods:{
+		$_krot_upload_files_selectFile(type){
+			if(type === 0){
+				fetch("../../public/files/dataset_test.json")
+					.then(async (res) => {
+						const blob = await res.blob()
+						const file = new File([blob], "dataset_test.json")
+						this.$_krot_upload_files_uploadFile(file)
+					})
+					.catch((e) => console.error(e));
+			}
+			if(type === 1){
+				fetch("../../public/files/dataset_train.json")
+					.then(async (res) => {
+						const blob = await res.blob()
+						const file = new File([blob], "dataset_train.json")
+						this.$_krot_upload_files_uploadFile(file)
+					})
+					.catch((e) => console.error(e));
+			}
+			if(type === 2) this.$refs.refInputLoad.click()
+		},
 		$_krot_upload_files_cancel(){
 			this.spinner = false
 			this.controller.abort()
