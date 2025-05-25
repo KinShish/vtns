@@ -85,10 +85,12 @@ export default {
 	},
 	methods:{
 		$_krot_result_downloadFile(){
-			const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.$props.local_rows.map(i=>{return{
-				accountId: i.accountId,
-				isCommercial: i.isCommercial
-			}})))
+			const data = JSON.parse(JSON.stringify(this.$props.local_rows))
+			for(let item of data){
+				delete item.percent
+				delete item.status
+			}
+			const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data))
 			const downloadAnchorNode = document.createElement('a');
 			downloadAnchorNode.setAttribute("href",dataStr);
 			downloadAnchorNode.setAttribute("download", "AntiKrot.json");

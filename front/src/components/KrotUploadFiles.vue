@@ -61,7 +61,7 @@ export default {
 	methods:{
 		$_krot_upload_files_selectFile(type){
 			if(type === 0){
-				fetch("../../public/files/dataset_test.json")
+				fetch(`http://5.35.92.160/img/files/dataset_test.json`)
 					.then(async (res) => {
 						const blob = await res.blob()
 						const file = new File([blob], "dataset_test.json")
@@ -70,7 +70,7 @@ export default {
 					.catch((e) => console.error(e));
 			}
 			if(type === 1){
-				fetch("../../public/files/dataset_train.json")
+				fetch("http://5.35.92.160/img/files/dataset_train.json")
 					.then(async (res) => {
 						const blob = await res.blob()
 						const file = new File([blob], "dataset_train.json")
