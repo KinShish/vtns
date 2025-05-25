@@ -2,7 +2,9 @@
 .checkboxBlock(:class="{'disabled':$props.disabled}" :style="`--bg:${$props.bg};--border:${$props.border}`")
 	input(:id="idLocal" type="checkbox" v-model="value" :true-value="$props.trueValue" :false-value="$props.falseValue"
 		@change="$emit('update:modelValue',value)" :disabled="$props.disabled")
-	label(:for="idLocal" v-if="$props.label") {{$props.label}}
+	label(:for="idLocal" v-if="$props.label || $props.desc")
+		.name(v-if="$props.label") {{$props.label}}
+		.desc(v-if="$props.desc") {{$props.desc}}
 </template>
 
 <script>
@@ -17,6 +19,10 @@ export default {
 			default: false
 		},
 		label:{
+			type:String,
+			default:''
+		},
+		desc:{
 			type:String,
 			default:''
 		},
@@ -67,12 +73,21 @@ export default {
 		label{
 			display: flex;
 			flex-direction: column;
-			gap: 4px;
+			gap: 5px;
 			width: fit-content;
 			user-select: none;
-			font-weight: 400;
-			font-size: 16px;
-			line-height: 24px;
+			.name{
+				font-weight: 400;
+				font-size: 16px;
+				line-height: 110%;
+				white-space: nowrap;
+			}
+			.desc{
+				font-weight: 500;
+				font-size: 16px;
+				line-height: 110%;
+				color: #9AACD0;
+			}
 		}
 	}
 	input[type=checkbox]{

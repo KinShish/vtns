@@ -10,5 +10,11 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		@media (max-width: 991px) {
+			height: 30px;
+			img{height: 28px;}
+			position: sticky;
+			top: 0;
+		}
 	}
 </style>

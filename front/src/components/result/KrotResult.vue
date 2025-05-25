@@ -1,48 +1,57 @@
 <template lang="pug">
 #resultBlock
 .title Результат распознавания
-.container
-	.legend
-		.info От 0% - 25%
-			.status.status-1
-		.greyLine
-		.info От 25% - 65%
-			.status.status-2
-		.greyLine
-		.info От 65% - 100%
-			.status.status-3
-	.rowFilter
-		div
+.container(:class="{'secondType':$props.type === 1}")
+	.rowFilter.shadowBlock
+		.chart
+			KrotUiChartPie(:colors="$props.type?['#9F9D9D78','#13A43878']:['#13A43878', '#F2B63678', '#FF584578', '#9F9D9D78']"
+				:data="$props.type?[filterCount[0],filterCount[3]]:filterCount"
+				:labels="$props.type?['Коммерция','Частники']:['Не выявлено','Есть подозрение','Высокая вероятность','Коммерция']")
+		.filters
 			.subtitle Распознано объектов: {{totalSumm}}
-			.checkBoxList
+			.checkBoxList(v-if="type === 0")
 				KrotUiCheckbox(:label="`- Не выявлено: ${filterCount[0]}`" bg="#13A438" border="#13A438" v-model="filter[0]"
+					desc="От 0% - 25%" @update:modelValue="$_krot_result_filter")
+				KrotUiCheckbox(:label="`- Есть подозрение: ${filterCount[1]}`" bg="#F2B636" border="#F2B636" v-model="filter[1]"
+					desc="От 25% - 65%" @update:modelValue="$_krot_result_filter")
+				KrotUiCheckbox(:label="`- Высокая вероятность: ${filterCount[2]}`" bg="#FF5845" border="#FF5845" v-model="filter[2]"
+					desc="От 65% - 100%" @update:modelValue="$_krot_result_filter")
+				KrotUiCheckbox(:label="`- Коммерция: ${filterCount[3]}`" bg="#9F9D9D" border="#9F9D9D" v-model="filter[3]"
 					@update:modelValue="$_krot_result_filter")
-				KrotUiCheckbox(:label="`- Есть подозрение: ${filterCount[1]}`" bg="#13A438" border="#13A438" v-model="filter[1]"
+			.checkBoxList(v-else)
+				KrotUiCheckbox(:label="`Частники: ${filterCount[0]}`" bg="#13A438" border="#13A438" v-model="filter[0]"
 					@update:modelValue="$_krot_result_filter")
-				KrotUiCheckbox(:label="`- Коммерческие организации: ${filterCount[2]}`" bg="#FF5845" border="#FF5845" v-model="filter[2]"
+				KrotUiCheckbox(:label="`Коммерция: ${filterCount[3]}`" bg="#FF5845" border="#FF5845" v-model="filter[3]"
 					@update:modelValue="$_krot_result_filter")
-		.download Скачать JSON
+	.rowFilter
+		.subtitle Список распознанных объектов
+		.download(@click="$_krot_result_downloadFile") Скачать JSON
 			img(src="/img/result/arrowDown.svg")
-	KrotUiTable(:table="table")
-		.rowTable(v-for="item of rows.slice(0,page*100)" :class="`status-${item.status}`"
+	KrotUiTable(:table="table" heightScroll="auto")
+		.rowTable(v-for="item of rows.slice(0,(page*100))" :class="`status-${item.status}`" :key="item.accountId"
 			@click="$_krot_result_openModal(item)")
 			.col {{item.accountId}}
 			.col {{item.address}}
 			.col {{item.consumptionAll}} кВт
-			.col.center
-				.percent {{item.percent}}
+			.col.center(v-if="!$props.type")
+				.percent(v-if="item.status !== 4") {{item.percent}}
 					span %
 					img(src="/img/result/light.svg")
+				.percent(v-else style="width:fit-content;") Коммерция
+					img(src="/img/result/light.svg")
 				img.more(src="/img/result/arrowRight.svg")
+			.col.center(v-else)
+				.percent {{item.status === 4?'Коммерция':'Частник'}}
+					img(src="/img/result/light.svg")
 		#downLazy(style="height:20px;width:20px;")
-transition(name="fade" mode="out-in")
-	KrotResultModal(v-if="modal.show" :data="modal.data")
+KrotResultModal(v-if="modal.show" :data="modal.data" @close="modal.show = false ")
 </template>
 
 <script>
 import KrotUiCheckbox from "@/components/ui/KrotUiCheckbox.vue";
 import KrotUiTable from "@/components/ui/KrotUiTable.vue";
 import {defineAsyncComponent} from "vue";
+import KrotUiChartPie from "@/components/ui/KrotUiChartPie.vue";
 
 export default {
 	props:{
@@ -51,15 +60,15 @@ export default {
 	},
 	data(){
 		return{
-			filter: [true,true,true],
-			filterCount: [0,0,0],
-			rows: JSON.parse(JSON.stringify(this.local_rows)),
+			filter: [true,true,true,false],
+			filterCount: [0,0,0,0],
+			rows: [],
 			page: 1,
 			table: [
 				{name:'ID', width:'70px', class:'center'},
 				{name:'Адрес', width:'auto'},
 				{name:'Кол-во, кВт ', width:'150px', class:'start'},
-				{name:'Статус', width:'160px', class:'center'}
+				{name:'Статус', width:'200px', class:'center'}
 			],
 			observer: undefined,
 			modal: {
@@ -70,11 +79,23 @@ export default {
 	},
 	computed:{
 		totalSumm(){
-			let sum = this.filterCount[0] + this.filterCount[1] + this.filterCount[2]
+			let sum = this.filterCount[0] + this.filterCount[1] + this.filterCount[2] + this.filterCount[3]
 			return sum.toLocaleString()
 		}
 	},
 	methods:{
+		$_krot_result_downloadFile(){
+			const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.$props.local_rows.map(i=>{return{
+				accountId: i.accountId,
+				isCommercial: i.isCommercial
+			}})))
+			const downloadAnchorNode = document.createElement('a');
+			downloadAnchorNode.setAttribute("href",dataStr);
+			downloadAnchorNode.setAttribute("download", "AntiKrot.json");
+			document.body.appendChild(downloadAnchorNode);
+			downloadAnchorNode.click();
+			downloadAnchorNode.remove();
+		},
 		$_krot_result_filter(){
 			this.page = 1
 			const arrStatus = []
@@ -105,7 +126,9 @@ export default {
 		}
 	},
 	created() {
+		if(this.$props.type) this.filter[3] = true
 		this.$_krot_result_calc()
+		this.$_krot_result_filter()
 	},
 	mounted() {
 		this.$_krot_result_lazy()
@@ -121,6 +144,7 @@ export default {
 		}
 	},
 	components: {
+		KrotUiChartPie,
 		KrotUiTable, KrotUiCheckbox,
 		KrotResultModal: defineAsyncComponent(()=> import("@/components/result/KrotResultModal.vue")),
 	}
@@ -136,56 +160,62 @@ export default {
 		line-height: 110%;
 		letter-spacing: -3%;
 		color: #1A202C;
+		@media (max-width: 991px) {
+			font-size: 30px;
+		}
+		@media (max-width: 768px) {
+			font-size: 24px;
+		}
 	}
 	.container{
 		margin-bottom: 60px;
-		.legend{
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			gap: 21px;
-			height: 75px;
-			background: #F6F6F6;
-			border: 1px solid #EEFFF2;
-			margin-bottom: 24px;
-			border-radius: 16px;
-			.info{
-				display: flex;
-				align-items: center;
-				gap: 6px;
-				font-weight: 500;
-				font-size: 16px;
-				line-height: 110%;
-				color: #9AACD0;
-			}
-			.status{
-				width: 12px;
-				height: 12px;
-				border-radius: 50%;
-				&-1{background-color: #13A438;}
-				&-2{background-color: #F2B636;}
-				&-3{background-color: #FF5845;}
-			}
-			.greyLine{
-				height: 44px;
-				width: 1px;
-				background-color: #B4B6C4;
-			}
-		}
 		.rowFilter{
 			display: flex;
 			justify-content: space-between;
 			margin-bottom: 15px;
+			@media (max-width: 576px) {
+				flex-wrap: wrap;
+				gap: 8px;
+				justify-content: space-between;
+			}
+			&.shadowBlock{
+				background-color: white;
+				box-shadow: 0px -6px 7px 0px #00000012;
+				padding: 16px;
+				border-radius: 16px 16px 0 0;
+				gap: 30px;
+				background-image: url('/img/result/lightBg.svg');
+				background-repeat: no-repeat;
+				background-position: 98% 16px;
+				.chart{
+					width: 140px;
+					height: 140px;
+					flex: none;
+					@media (max-width: 576px) {
+						margin: auto;
+					}
+				}
+				.filters{
+					flex: auto;
+					display: flex;
+					flex-direction: column;
+					gap: 10px;
+					.checkBoxList{
+						display: flex;
+						flex-wrap: wrap;
+						gap: 30px;
+						margin-top: 10px;
+						@media (max-width: 991px) {
+							gap: 16px;
+						}
+					}
+				}
+			}
 			.subtitle {
 				font-weight: 700;
 				font-size: 16px;
 				line-height: 30px;
 				color: #092C4C;
-			}
-			.checkBoxList{
-				display: flex;
-				gap: 30px;
-				margin-top: 10px;
 			}
 			.download {
 				cursor: pointer;
@@ -196,6 +226,9 @@ export default {
 				font-size: 14px;
 				line-height: 30px;
 				color: #7545FF;
+				@media (max-width: 576px) {
+					margin-left: auto;
+				}
 			}
 		}
 		.rowTable{
@@ -212,6 +245,10 @@ export default {
 			&.status-3{
 				background-color: #FFF5F0;
 				.percent{background-color: #FF5845;}
+			}
+			&.status-4{
+				background-color: #F6F6F6;
+				.percent{background-color: #858585;}
 			}
 			.col{
 				overflow: hidden;
@@ -235,6 +272,16 @@ export default {
 					span{margin-left: -3px;}
 				}
 			}
+		}
+	}
+	.secondType{
+		.status-1{
+			background-color: #EEFFF2 !important;;
+			.percent{background-color: #13A438 !important;;}
+		}
+		.status-4{
+			background-color: #FFF5F0 !important;;
+			.percent{background-color: #FF5845 !important;;}
 		}
 	}
 </style>

@@ -120,21 +120,34 @@ export default {
 			this.spinner = true
 			const formData = new FormData()
 			formData.append('file',file)
-			const res = await this.$makeRequest('POST','load/dataset/chek',formData,this.controller.signal,
+
+			const res = await this.$makeRequest('POST',(this.type?'load/dataset/update/commerce':'load/dataset/chek'),formData,this.controller.signal,
 				(e)=>{
 				this.percent = ((e.loaded / e.total) * 100).toFixed(2);
 				})
 			if(res){
 				for(let item of res){
 					if(item.percent) {
-						item.percent = item.percent*100
+						item.percent = item.percent * 100
 						item.percent = item.percent.toFixed(2)
-						if(item.percent<25) item.status = 1
-						else {
-							if(item.percent>65) item.status = 3
-							else item.status = 2
+					}
+					if(this.type === 0){
+						if(item.isCommercial) item.status = 4
+						else{
+							if(item.percent) {
+								if(!item.status){
+									if(item.percent<25) item.status = 1
+									else {
+										if(item.percent>65) item.status = 3
+										else item.status = 2
+									}
+								}
+							} else item.status = 0
 						}
-					} else item.status = 0
+					} else {
+						if(item.isCommercial) item.status = 4
+						else item.status = 1
+					}
 					if(item.consumption){
 						item.consumptionAll = 0
 						for(let cons of Object.values(item.consumption)){
@@ -184,6 +197,12 @@ export default {
 			letter-spacing: -3%;
 			text-align: center;
 			z-index: 2;
+			@media (max-width: 991px) {
+				font-size: 30px;
+			}
+			@media (max-width: 768px) {
+				font-size: 24px;
+			}
 		}
 		.container{
 			z-index: 2;
@@ -217,6 +236,9 @@ export default {
 							height: 100%;
 							background-color: #7545FF;
 							transition: .3s ease-out;
+						}
+						@media (max-width: 768px) {
+							width: calc(100% - 32px);
 						}
 					}
 					.cancel{
@@ -265,6 +287,9 @@ export default {
 					color: #1A202C;
 					line-height: 24px;
 					margin-top: 16px;
+					@media (max-width: 576px) {
+						font-size: 14px;
+					}
 				}
 				.blurBlock{
 					width: 100%;

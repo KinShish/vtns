@@ -21,13 +21,22 @@
 		background-color: #F6F6F6;
 		padding-top: 24px;
 		padding-bottom: 24px;
+		@media (max-width: 991px) {
+			height: fit-content;
+		}
 		.rowInfo{
 			display: flex;
 			gap: 24px;
 			align-items: flex-start;
 			margin-top: 20px;
+			@media (max-width: 991px) {
+				flex-wrap: wrap;
+			}
 			.address{
 				flex: auto;
+				@media (max-width: 991px) {
+					flex-basis: 100%;
+				}
 				.text{
 					font-weight: 400;
 					font-size: 14px;
@@ -38,6 +47,10 @@
 			.additional{
 				width: 260px;
 				flex: none;
+				@media (max-width: 576px) {
+					flex-basis: 100%;
+					width: 100%;
+				}
 				a{
 					color: #0097FE;
 					font-weight: 400;

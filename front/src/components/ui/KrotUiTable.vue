@@ -46,6 +46,7 @@ export default {
 	}
 	.mainBlockTable{
 		min-width: 1000px;
+		width: 100%;
 	}
 	.headBlock{
 		display: grid;
