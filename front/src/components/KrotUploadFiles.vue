@@ -11,7 +11,7 @@
 				img.typeFile(src="/img/upload/json.svg")
 				.labelUpload(@click="openModalSelect = true") Загрузить DATASET
 				br
-				KrotUiSwitch(label="Проверка на коммерцию" v-model="type" :chosen="1" notChosen="0")
+				KrotUiSwitch(label="Тестовые данные" v-model="type" :chosen="1" :notChosen="0")
 				.text Или перетащите сюда необходимые файлы
 			.contnets(v-if="!showDropFiles && file.name")
 				.fileName
@@ -198,7 +198,9 @@ export default {
 	.uploadBlock{
 		min-height: 746px;
 		height: calc(100vh - 225px);
-		background: linear-gradient(83.79deg, #13A438 3.25%, #13A438 96.85%);
+		background-image: url("/img/upload/bg.jpg");
+		background-position: center;
+		background-repeat: no-repeat;
 		display: flex;
 		flex-direction: column;
 		gap: 60px;

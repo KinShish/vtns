@@ -79,7 +79,7 @@ export default {
 			.name{
 				font-weight: 400;
 				font-size: 16px;
-				line-height: 110%;
+				line-height: 24px;
 				white-space: nowrap;
 			}
 			.desc{

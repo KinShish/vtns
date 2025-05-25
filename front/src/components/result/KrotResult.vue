@@ -13,9 +13,9 @@
 				KrotUiCheckbox(:label="`- Не выявлено: ${filterCount[0]}`" bg="#13A438" border="#13A438" v-model="filter[0]"
 					desc="От 0% - 25%" @update:modelValue="$_krot_result_filter")
 				KrotUiCheckbox(:label="`- Есть подозрение: ${filterCount[1]}`" bg="#F2B636" border="#F2B636" v-model="filter[1]"
-					desc="От 25% - 65%" @update:modelValue="$_krot_result_filter")
+					desc="От 26% - 65%" @update:modelValue="$_krot_result_filter")
 				KrotUiCheckbox(:label="`- Высокая вероятность: ${filterCount[2]}`" bg="#FF5845" border="#FF5845" v-model="filter[2]"
-					desc="От 65% - 100%" @update:modelValue="$_krot_result_filter")
+					desc="От 66% - 100%" @update:modelValue="$_krot_result_filter")
 				KrotUiCheckbox(:label="`- Коммерция: ${filterCount[3]}`" bg="#9F9D9D" border="#9F9D9D" v-model="filter[3]"
 					@update:modelValue="$_krot_result_filter")
 			.checkBoxList(v-else)
@@ -95,6 +95,7 @@ export default {
 			document.body.appendChild(downloadAnchorNode);
 			downloadAnchorNode.click();
 			downloadAnchorNode.remove();
+			alert('Файл успешно скачан')
 		},
 		$_krot_result_filter(){
 			this.page = 1
