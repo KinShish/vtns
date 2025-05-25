@@ -89,6 +89,7 @@ export default {
 			for(let item of data){
 				delete item.percent
 				delete item.status
+				delete item.aproxima
 			}
 			const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data))
 			const downloadAnchorNode = document.createElement('a');
