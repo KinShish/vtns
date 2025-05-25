@@ -15,7 +15,7 @@
 			img{height: 28px;}
 			position: sticky;
 			top: 0;
-			z-index: 2;
+			z-index: 3;
 		}
 	}
 </style>

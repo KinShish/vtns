@@ -1,9 +1,7 @@
 <template lang="pug">
 .uploadBlock
 	img.backImg(src="/img/upload/shadow.svg")
-	.title Сервис для выявления
-		div превышенных лимитов потребления
-		div электроэнергии
+	.title Сервис для выявления незаконного потребления электроэнергии юридическими лицами и поиска доказательств нарушений
 	.container
 		input#file(type="file" accept=".json" ref="refInputLoad" @change="$_krot_upload_files_changeFile")
 		#dropZone.uploadZone(:class="{'active':showDropFiles}" v-show="!spinner")
