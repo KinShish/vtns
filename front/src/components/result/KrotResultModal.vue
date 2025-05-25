@@ -39,7 +39,7 @@
 						img(:src="`${url}uploads/account/${$props.data.accountId}/${item}`" v-if="images.includes(item)")
 						a.resource(:href="`${links[item]}${$props.data.address}`" target="_blank")
 							img(src="/img/result/link.svg")
-							| Перейти к источнику
+							| Перейти к источнику({{names[item]}})
 		.btnClose(@click="$emit('close')") Закрыть
 </template>
 
@@ -64,6 +64,13 @@ export default {
 				'list-org-chrome.png':'https://www.list-org.com/search?type=name&val=',
 				'rusprofile-chrome.png':'https://www.rusprofile.ru/search?query=',
 				'avito-chrome.png':'https://www.avito.ru/?q=',
+			},
+			names:{
+				'google-chrome.png':'Google карты',
+				'ya-chrome.png':'Yandex карты',
+				'list-org-chrome.png':'list-org.com',
+				'rusprofile-chrome.png':'rusprofile.ru',
+				'avito-chrome.png':'Авито',
 			},
 			images:[]
 		}
