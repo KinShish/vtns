@@ -35,9 +35,10 @@
 			.halfBlock
 				.whiteBlock
 					.mainName Подтверждающие ресурсы
-					.pic
-						img(src="/img/test.jpg")
-						.resource
+					.noData(v-if="!images.length") Список пуст
+					.pic(v-for="item of images")
+						img(:src="`${url}uploads/account/${1509}/${item}`")
+						a.resource(:href="`${links[item]}${$props.data.address}`" target="_blank")
 							img(src="/img/result/link.svg")
 							| Перейти к источнику
 		.btnClose(@click="$emit('close')") Закрыть
@@ -57,14 +58,22 @@ export default {
 	},
 	data(){
 		return{
-
+			url:import.meta.env.VITE_URL_SERVER,
+			links:{
+				'google-chrome.png':'https://www.google.com/maps?output=search&q=',
+				'ya-chrome.png':'https://ya.ru/maps?text=',
+				'list-org-chrome.png':'https://www.list-org.com/search?type=name&val=',
+				'rusprofile-chrome.png':'https://www.rusprofile.ru/search?query=',
+				'avito-chrome.png':'https://www.avito.ru/?q=',
+			},
+			images:[]
 		}
 	},
 	methods:{
 		async $_krot_result_modal_load(){
-			const res = await this.$makeRequest('GET',`uploads/account/${this.$props.data.accountId}`)
+			const res = await this.$makeRequest('GET',`uploads/account/${1509}`)
 			if(res){
-				console.log(res)
+        this.images = res
 			}
 		},
 	},
@@ -298,6 +307,10 @@ export default {
 				margin-top: 10px;
 				img{width: auto}
 			}
+		}
+		.noData{
+			text-align: center;
+			font-size: 20px;
 		}
 	}
 </style>
