@@ -12,7 +12,7 @@ def predict(dataset):
     mean = tf.reduce_mean(x_test, axis=0)
     std = tf.math.reduce_std(x_test, axis=0)
     x_test = (x_test - mean) / std
-
+    len(x_test)
     test_predictions = model.predict(x_test).flatten()
     percent_accounts=[]
     for i in range(len(x_test)):

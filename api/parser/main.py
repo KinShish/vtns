@@ -20,14 +20,14 @@ def send_parser(id,adress):
                 if not os.path.isfile(f"../upload/{account['accountId']}/{array[i][1]}"):
                     context = NewContext(browser, fingerprint=fingerprint)
                     page = context.new_page()
-                    time.sleep(15)
+                    time.sleep(20)
                     page.goto(array[i][0]+adress, wait_until="domcontentloaded")
                     page.screenshot(path=f"../upload/{account['accountId']}/{array[i][1]}")
             except ZeroDivisionError:
                 print("error parser "+array[i])
                 browser.close()
         browser.close()
-with open('../dataset/dataset_train.json', 'r', encoding='utf-8') as f:
+with open('../dataset/dataset_test.json', 'r', encoding='utf-8') as f:
   dataset_train = json.load(f)
 for account in dataset_train:
     if not os.path.exists(f"../upload/{account['accountId']}"):

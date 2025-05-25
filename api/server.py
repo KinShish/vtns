@@ -27,10 +27,12 @@ def load_dataset_chek():
   if file and allowed_file(file.filename):
     filename = secure_filename(file.filename)
     file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-    with open(app.config['UPLOAD_FOLDER'] + '/dataset_test.json', 'r', encoding='utf-8') as f:
+    with open(app.config['UPLOAD_FOLDER'] + '/'+filename, 'r', encoding='utf-8') as f:
       dataset_train = json.load(f)
+    print(1111,len(dataset_train))
     dataset = normalize_api.normalize(dataset_train)
     percent_accounts = predict.predict(dataset)
+    print(len(percent_accounts))
     for i in range(len(percent_accounts)):
       if percent_accounts[i][1] == dataset_train[i]['accountId']:
         dataset_train[i]['percent'] = percent_accounts[i][0]
@@ -48,7 +50,7 @@ def load_dataset_commerce():
   if file and allowed_file(file.filename):
     filename = secure_filename(file.filename)
     file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-    with open(app.config['UPLOAD_FOLDER'] + '/dataset_test.json', 'r', encoding='utf-8') as f:
+    with open(app.config['UPLOAD_FOLDER'] + '/'+filename, 'r', encoding='utf-8') as f:
       dataset_train = json.load(f)
     dataset = normalize_api.normalize_commerce(dataset_train)
     percent_accounts = predict.predict_commerce(dataset)
@@ -70,9 +72,6 @@ def download_file(id,name):
   print(app.config["UPLOAD_FOLDER"],id)
   return send_from_directory(f'upload/{id}', name)
 
-app.add_url_rule(
-    "/uploads/account/<id>", endpoint="download_file", build_only=True
-)
 @app.route('/')
 def hello_world():
 
