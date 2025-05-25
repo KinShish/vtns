@@ -21,6 +21,7 @@ export default {
 	},
 	methods:{
 		$_krot_app_setData(data){
+			this.showResult = false
 			this.rows = data.rows
 			this.type = data.type
 			this.showResult = true
