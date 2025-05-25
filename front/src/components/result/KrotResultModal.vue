@@ -35,9 +35,8 @@
 			.halfBlock
 				.whiteBlock
 					.mainName Подтверждающие ресурсы
-					.noData(v-if="!images.length") Список пуст
-					.pic(v-for="item of images")
-						img(:src="`${url}uploads/account/${1509}/${item}`")
+					.pic(v-for="(_,item) of links")
+						img(:src="`${url}uploads/account/${$props.data.accountId}/${item}`" v-if="images.includes(item)")
 						a.resource(:href="`${links[item]}${$props.data.address}`" target="_blank")
 							img(src="/img/result/link.svg")
 							| Перейти к источнику
@@ -71,10 +70,8 @@ export default {
 	},
 	methods:{
 		async $_krot_result_modal_load(){
-			const res = await this.$makeRequest('GET',`uploads/account/${1509}`)
-			if(res){
-        this.images = res
-			}
+			const res = await this.$makeRequest('GET',`uploads/account/${this.$props.data.accountId}`)
+			if(res) this.images = res
 		},
 	},
 	created() {
@@ -307,10 +304,6 @@ export default {
 				margin-top: 10px;
 				img{width: auto}
 			}
-		}
-		.noData{
-			text-align: center;
-			font-size: 20px;
 		}
 	}
 </style>
